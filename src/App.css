@@ -1,5 +1,7 @@
 .App {
   text-align: center;
+  width: 100%;
+  height: 100%;
 }
 
 .App-logo {
@@ -35,4 +37,75 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.main {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 200%;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #adadad;
+}
+
+.left-main {
+  padding: 70px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.right-main {
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+.main-text {
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 1135;
+  height: 456;
+}
+
+.main-button-block {
+  padding-top: 70px;
+  margin-top: 30px;
+  text-align: center;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  flex-direction: row;
+}
+
+.round-block {
+  background-color: #d2d2d2;
+  font-family: 'Neue Machina';
+  font-size: 30px;
+  border-radius: 18px;
+  margin: 5px;
+  padding: 5px;
+  width: 600px;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+}
+
+.appointment {
+  background-color: #adadad;
+  min-height: 900px;
+}
+
+.appointment-content {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.button-style {
+  font-size: 20px;
+  font-family: 'Neue Machina';
+  color: #000000;
+  border-color: #000000;
+  border-radius: 18px;
 }

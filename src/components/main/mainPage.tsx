@@ -77,7 +77,7 @@ export default function MainPage() {
             }}
             gutterBottom
           >
-            ONLY FOR MAN
+            ONLY FOR MEN
           </Typography>
         </div>
 

@@ -11,6 +11,7 @@ import {
   InputLabel,
   Select,
   Avatar,
+  Grid,
 } from '@mui/material';
 import { AmenityDto } from '../../api/models/amenity';
 import { UserDto } from '../../api/models/user';
@@ -122,14 +123,14 @@ export default function NewAppointmentPage() {
                     }}
                   >
                     <Avatar src={currentUser.logoAttachmentUrl} />
-                    <div style={{ marginLeft: '16px' }}>
+                    <Grid ml={2}>
                       <Typography>
                         {currentUser.firstName} {currentUser.lastName}
                       </Typography>
                       <Typography variant='body2' color='text.secondary'>
                         {currentUser.email}
                       </Typography>
-                    </div>
+                    </Grid>
                   </div>
 
                   <TextField

@@ -1,6 +1,13 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Button, Typography, Card, CardContent, Avatar } from '@mui/material';
+import {
+  Button,
+  Typography,
+  Card,
+  CardContent,
+  Avatar,
+  Grid,
+} from '@mui/material';
 import { AppointmentDto } from '../../api/models/appointment';
 import { AmenityDto } from '../../api/models/amenity';
 import { UserDto } from '../../api/models/user';
@@ -85,7 +92,7 @@ export default function AppointmentDetailsPage() {
           Детали записи
         </Typography>
 
-        <div style={{ marginBottom: '20px' }}>
+        <Grid mb={3}>
           <Button
             component={Link}
             to={'/appointments'}
@@ -94,11 +101,11 @@ export default function AppointmentDetailsPage() {
           >
             Назад к списку
           </Button>
-        </div>
+        </Grid>
 
         <Card>
           <CardContent style={{ backgroundColor: '#c9c8c8' }}>
-            <div style={{ marginBottom: '24px' }}>
+            <Grid mb={3}>
               <Typography variant='h5' component='div'>
                 {appointment.service?.serviceName}
               </Typography>
@@ -112,9 +119,9 @@ export default function AppointmentDetailsPage() {
               <Typography variant='body2' color='text.secondary'>
                 Стоимость: ${appointment.service?.price}
               </Typography>
-            </div>
+            </Grid>
 
-            <div style={{ marginBottom: '24px' }}>
+            <Grid mb={3}>
               <Typography variant='h6'>Клиент</Typography>
               <div
                 style={{
@@ -124,7 +131,7 @@ export default function AppointmentDetailsPage() {
                 }}
               >
                 <Avatar src={appointment.client?.logoAttachmentUrl} />
-                <div style={{ marginLeft: '16px' }}>
+                <Grid ml={2}>
                   <Typography>
                     {appointment.client?.firstName}{' '}
                     {appointment.client?.lastName}
@@ -135,16 +142,16 @@ export default function AppointmentDetailsPage() {
                   <Typography variant='body2' color='text.secondary'>
                     {appointment.client?.phoneNumber}
                   </Typography>
-                </div>
+                </Grid>
               </div>
-            </div>
+            </Grid>
 
-            <div style={{ marginBottom: '24px' }}>
+            <Grid mb={3}>
               <Typography variant='h6'>Примечание</Typography>
-              <Typography variant='body1' style={{ marginTop: '8px' }}>
+              <Typography variant='body1' mt={1}>
                 {appointment.notes}
               </Typography>
-            </div>
+            </Grid>
 
             <div className='appointment-details-page-down-button'>
               <Button variant='outlined' color='secondary' sx={buttonSx}>

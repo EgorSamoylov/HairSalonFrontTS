@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Typography, Card, CardContent } from '@mui/material';
+import { Button, Typography, Card, CardContent, Grid } from '@mui/material';
 import { AppointmentDto } from '../../api/models/appointment';
 import { AmenityDto } from '../../api/models/amenity';
 import { UserDto } from '../../api/models/user';
@@ -62,7 +62,7 @@ export default function AppointmentsPage() {
           Список записей
         </Typography>
 
-        <div style={{ textAlign: 'left', marginBottom: '20px' }}>
+        <Grid container justifyContent='flex-start' mb={2.5} gap={2}>
           <Button
             component={Link}
             to={'/appointments/new'}
@@ -82,7 +82,7 @@ export default function AppointmentsPage() {
           >
             Вернуться на главную
           </Button>
-        </div>
+        </Grid>
 
         <div
           style={{
@@ -125,7 +125,7 @@ function AppointmentCard({ appointment }: AppointmentCardProps) {
           <Typography variant='body2' color='text.secondary'>
             Продолжительность: {appointment.appointmentDateTime?.getDate()} мин
           </Typography>
-          <Typography variant='body1' style={{ marginTop: '8px' }}>
+          <Typography variant='body1' mt={1}>
             Примечание: {appointment.notes}
           </Typography>
         </div>

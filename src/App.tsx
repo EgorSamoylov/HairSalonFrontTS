@@ -9,24 +9,34 @@ import MainPage from './components/main/mainPage';
 import AppointmentDetailsPage from './components/main/AppointmentDetailsPage';
 import { theme } from './theme';
 import { ThemeProvider } from '@mui/material';
+import { Provider } from 'react-redux';
+import store from './store/store';
+import AuthProtected from './components/AuthProtected';
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <Router>
-        <Routes>
-          <Route path='/' element={<MainPage />} />
-          <Route path='/appointments' element={<AppointmentsPage />} />
-          <Route path='/appointments/new' element={<NewAppointmentPage />} />
-          <Route path='/login' element={<LoginPage />} />
-          <Route path='/register' element={<RegisterPage />} />
-          <Route
-            path='/appointments/:id'
-            element={<AppointmentDetailsPage />}
-          />
-        </Routes>
-      </Router>
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <Router>
+          <Routes>
+            <Route path='/' element={<MainPage />} />
+            <Route path='/appointments' element={<AppointmentsPage />} />
+            <Route path='/appointments/new' element={<NewAppointmentPage />} />
+            <Route path='/login' element={<LoginPage />} />
+            <Route path='/register' element={<RegisterPage />} />
+            <Route
+              path='/appointments/:id'
+              element={<AppointmentDetailsPage />}
+            />
+
+            {/* Protected routes */}
+            <Route element={<AuthProtected />}>
+              <Route path='/' element={<MainPage />} />
+            </Route>
+          </Routes>
+        </Router>
+      </ThemeProvider>
+    </Provider>
   );
 }
 

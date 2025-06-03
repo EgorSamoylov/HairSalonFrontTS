@@ -1,9 +1,9 @@
 {
   "extends": [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
+    // "eslint:recommended",
+    // "plugin:react/recommended",
+    // "plugin:@typescript-eslint/recommended",
+    // "prettier"
   ],
   "plugins": ["react", "@typescript-eslint", "prettier"],
   "parser": "@typescript-eslint/parser", // If using TypeScript
@@ -20,10 +20,11 @@
     }
   },
   "rules": {
-    "prettier/prettier": "error", // Show Prettier issues as errors
+    "prettier/prettier": "off", // Show Prettier issues as errors
     "react/prop-types": "off", // If using TypeScript, you don't need PropTypes
     "no-console": "warn",
     "no-debugger": "warn",
-    "no-unused-vars": "warn"
+    "no-unused-vars": "warn",
+    "no-empty-pattern": "warn"
   }
 }

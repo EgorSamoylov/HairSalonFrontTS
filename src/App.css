@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Neue Machina';
+  src: url('../public/PPNeueMachina-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 .App {
   text-align: center;
   width: 100%;
@@ -108,4 +116,15 @@
   color: #000000;
   border-color: #000000;
   border-radius: 18px;
+}
+
+.appointment-details-page-down-button {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+body {
+  margin: 0;
+  font-family: 'Neue Machina', sans-serif;
 }

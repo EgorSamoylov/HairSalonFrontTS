@@ -6,12 +6,13 @@ import NewAppointmentPage from './components/main/newAppointmentPage';
 import LoginPage from './components/login/loginPage';
 import RegisterPage from './components/register/registerPage';
 import MainPage from './components/main/mainPage';
-import AppointmentDetailsPage from './components/main/AppointmentDetailsPage';
+import AppointmentDetailsPage from './components/main/appointmentDetailsPage';
 import { theme } from './theme';
 import { ThemeProvider } from '@mui/material';
 import { Provider } from 'react-redux';
 import store from './store/store';
 import AuthProtected from './components/AuthProtected';
+import LogoutPage from './components/logout/logoutPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path='/appointments/new' element={<NewAppointmentPage />} />
             <Route path='/login' element={<LoginPage />} />
             <Route path='/register' element={<RegisterPage />} />
+            <Route path='/logout' element={<LogoutPage />} />
             <Route
               path='/appointments/:id'
               element={<AppointmentDetailsPage />}

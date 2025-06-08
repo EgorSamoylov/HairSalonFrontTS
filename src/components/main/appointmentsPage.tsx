@@ -1,51 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Typography, Card, CardContent, Grid } from '@mui/material';
+import {
+  Button,
+  Typography,
+  Card,
+  CardContent,
+  Grid,
+  CircularProgress,
+} from '@mui/material';
 import { AppointmentDto } from '../../api/models/appointment';
-import { AmenityDto } from '../../api/models/amenity';
-import { UserDto } from '../../api/models/user';
+import { useAppointmentsQuery } from '../../api/appointmentApiSlice';
+import { EmptyState } from '../emptyState';
 
 export default function AppointmentsPage() {
-  const currentUser: UserDto = {
-    id: 1,
-    firstName: 'Client',
-    lastName: 'User',
-    email: 'client@example.com',
-    phoneNumber: '+1234567890',
-    logoAttachmentUrl: 'https://example.com/client-avatar.jpg',
-  };
-
-  const amenityies: AmenityDto[] = [
-    {
-      id: 1,
-      serviceName: 'Стрижка',
-      price: 25,
-      durationMinutes: 30,
-    },
-    {
-      id: 2,
-      serviceName: 'Окрас волос',
-      price: 50,
-      durationMinutes: 60,
-    },
-  ];
-
-  const appointments: AppointmentDto[] = [
-    {
-      id: 1,
-      client: currentUser,
-      service: amenityies[0],
-      appointmentDateTime: new Date('2023-06-15T10:00:00'),
-      notes: 'Подтвержденная запись',
-    },
-    {
-      id: 2,
-      client: currentUser,
-      service: amenityies[1],
-      appointmentDateTime: new Date('2023-06-20T14:00:00'),
-      notes: 'Ожидается',
-    },
-  ];
+  const { data: appointments, isLoading: isAppointmentsLoading } =
+    useAppointmentsQuery({});
 
   const buttonSx = {
     fontSize: '20px',
@@ -62,7 +31,13 @@ export default function AppointmentsPage() {
           Список записей
         </Typography>
 
-        <Grid container justifyContent='flex-start' mb={2.5} gap={2}>
+        <Grid
+          container
+          alignItems='center'
+          justifyContent='flex-start'
+          mb={2.5}
+          gap={2}
+        >
           <Button
             component={Link}
             to={'/appointments/new'}
@@ -88,14 +63,24 @@ export default function AppointmentsPage() {
           style={{
             display: 'flex',
             flexDirection: 'column',
+            alignItems: 'center',
             gap: '20px',
             width: '800px',
             backgroundColor: '#adadad',
           }}
         >
-          {appointments.map((appointment) => (
-            <AppointmentCard key={appointment.id} appointment={appointment} />
-          ))}
+          {isAppointmentsLoading ? (
+            <CircularProgress />
+          ) : appointments?.length ? (
+            appointments.map((appointment) => (
+              <AppointmentCard key={appointment.id} appointment={appointment} />
+            ))
+          ) : (
+            <EmptyState
+              title='У вас нет записей'
+              description='Запишитесь на стрижку, чтобы увидеть свои записи здесь'
+            />
+          )}
         </div>
       </div>
     </div>
@@ -123,7 +108,7 @@ function AppointmentCard({ appointment }: AppointmentCardProps) {
             {appointment.service?.serviceName}
           </Typography>
           <Typography variant='body2' color='text.secondary'>
-            Продолжительность: {appointment.appointmentDateTime?.getDate()} мин
+            Продолжительность: {appointment.service?.durationMinutes} мин
           </Typography>
           <Typography variant='body1' mt={1}>
             Примечание: {appointment.notes}

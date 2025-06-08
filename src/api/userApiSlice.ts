@@ -8,6 +8,7 @@ export type UserInfoResponse = {
   firstName: string;
   lastName: string;
   email: string;
+  phoneNumber: string;
   logoAttachmentUrl: string | null;
 };
 

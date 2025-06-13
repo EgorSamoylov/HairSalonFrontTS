@@ -1,7 +1,6 @@
 import { apiSlice } from './apiSlice';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type UserInfoRequest = any;
+export type UserInfoRequest = object;
 
 export type UserInfoResponse = {
   id: number;

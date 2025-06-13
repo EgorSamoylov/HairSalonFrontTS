@@ -16,8 +16,7 @@ export type RegisterRequest = {
   password: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RegisterResponse = any;
+export type RegisterResponse = object;
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -47,8 +46,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['User'],
     }),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    logout: builder.mutation<any, any>({
+    logout: builder.mutation<object, object>({
       query: () => ({
         url: '/Auth/logout',
         method: 'POST',

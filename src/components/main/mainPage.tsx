@@ -86,12 +86,7 @@ export default function MainPage() {
             BARBERSHOP
           </Typography>
 
-          <Typography
-            variant='h1'
-            sx={typographySx}
-            style={{ padding: '0px' }}
-            gutterBottom
-          >
+          <Typography variant='h1' sx={{ ...typographySx, p: 0 }} gutterBottom>
             ONLY FOR MEN
           </Typography>
         </div>
@@ -113,7 +108,7 @@ export default function MainPage() {
               </Button>
               <Button
                 component={Link}
-                to={'/logout'} // Предполагается, что у вас есть страница выхода
+                to={'/logout'}
                 variant='outlined'
                 sx={buttonSx}
               >

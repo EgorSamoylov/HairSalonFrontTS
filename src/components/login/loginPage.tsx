@@ -9,8 +9,6 @@ import {
   Box,
   Stack,
 } from '@mui/material';
-import { ThemeProvider } from '@mui/material/styles';
-import { theme } from '../../theme';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { useLoginMutation } from '../../api/authApiSlice';
@@ -58,7 +56,7 @@ export default function LoginPage() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <div>
       <Box
         sx={{
           backgroundColor: '#adadad',
@@ -156,6 +154,6 @@ export default function LoginPage() {
           </CardContent>
         </Card>
       </Box>
-    </ThemeProvider>
+    </div>
   );
 }

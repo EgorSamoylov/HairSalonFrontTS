@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   Button,
@@ -9,13 +9,39 @@ import {
   Grid,
   CircularProgress,
 } from '@mui/material';
-import { useAppointmentsQuery } from '../../api/appointmentApiSlice';
+import { AppointmentDto } from '../../api/models/appointment';
 
 export default function AppointmentDetailsPage() {
   const { id } = useParams<{ id: string }>();
-  const { data: appointments, isLoading, isError } = useAppointmentsQuery({});
 
-  const appointment = appointments?.find((appt) => appt.id === Number(id));
+  const [appointment, setAppointment] = useState<AppointmentDto>();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+
+  const fetchAppointmentById = async (id: number) => {
+    try {
+      const response = await fetch(`/api/appointments/${id}`);
+      if (!response.ok) {
+        throw new Error('Ошибка при загрузке информации о записи');
+      }
+      return await response.json();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      setIsError(true);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const loadAppointment = async () => {
+      setIsLoading(true);
+      const data = await fetchAppointmentById(Number(id));
+      setAppointment(data);
+      setIsLoading(false);
+    };
+
+    loadAppointment();
+  }, [id]);
 
   const buttonSx = {
     fontSize: '20px',

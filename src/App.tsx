@@ -20,20 +20,23 @@ function App() {
       <ThemeProvider theme={theme}>
         <Router>
           <Routes>
-            <Route path='/' element={<MainPage />} />
-            <Route path='/appointments' element={<AppointmentsPage />} />
-            <Route path='/appointments/new' element={<NewAppointmentPage />} />
+            {/* Public routes */}
             <Route path='/login' element={<LoginPage />} />
             <Route path='/register' element={<RegisterPage />} />
-            <Route path='/logout' element={<LogoutPage />} />
-            <Route
-              path='/appointments/:id'
-              element={<AppointmentDetailsPage />}
-            />
 
-            {/* Protected routes */}
+            {/* Protected routes - require authentication */}
             <Route element={<AuthProtected />}>
               <Route path='/' element={<MainPage />} />
+              <Route path='/appointments' element={<AppointmentsPage />} />
+              <Route
+                path='/appointments/new'
+                element={<NewAppointmentPage />}
+              />
+              <Route path='/logout' element={<LogoutPage />} />
+              <Route
+                path='/appointments/:id'
+                element={<AppointmentDetailsPage />}
+              />
             </Route>
           </Routes>
         </Router>

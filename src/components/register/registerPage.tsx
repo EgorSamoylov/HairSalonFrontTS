@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../../theme';
+import { useRegisterMutation } from '../../api/authApiSlice';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -23,11 +24,12 @@ export default function RegisterPage() {
     confirmPassword: '',
   });
   const navigate = useNavigate();
+  const [register] = useRegisterMutation({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Здесь будет логика регистрации
-    console.log(formData);
+    console.log(e);
+    register(formData);
     navigate('/');
   };
 

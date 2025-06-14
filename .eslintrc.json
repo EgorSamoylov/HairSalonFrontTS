@@ -6,7 +6,7 @@
     "prettier"
   ],
   "plugins": ["react", "@typescript-eslint", "prettier"],
-  "parser": "@typescript-eslint/parser", // If using TypeScript
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2020,
     "sourceType": "module",
@@ -20,11 +20,19 @@
     }
   },
   "rules": {
-    "prettier/prettier": "off", // Show Prettier issues as errors
-    "react/prop-types": "off", // If using TypeScript, you don't need PropTypes
+    "prettier/prettier": "off",
+    "react/prop-types": "off",
     "no-console": "warn",
     "no-debugger": "warn",
     "no-unused-vars": "warn",
-    "no-empty-pattern": "warn"
+    "no-empty-pattern": "warn",
+    "@typescript-eslint/no-unused-expressions": [
+      "error",
+      {
+        "allowShortCircuit": true,
+        "allowTernary": true,
+        "allowTaggedTemplates": true
+      }
+    ]
   }
 }

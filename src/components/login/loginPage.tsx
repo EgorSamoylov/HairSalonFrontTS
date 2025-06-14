@@ -36,8 +36,10 @@ export default function LoginPage() {
     onSubmit: async (values) => {
       try {
         const response = await login(values).unwrap();
-        localStorage.setItem('auth_token', response.token);
-        navigate('/');
+        if (response.token) {
+          localStorage.setItem('auth_token', response.token);
+          navigate('/');
+        }
       } catch (error) {
         console.error('Ошибка входа:', error);
         formik.setStatus('Неверные учетные данные');

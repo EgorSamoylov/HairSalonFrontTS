@@ -9,7 +9,7 @@ export const amenityApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     amenities: builder.query<GetAllAmenitiesResponse, GetAllAmenitiesRequest>({
       query: () => ({
-        url: '/Amenity',
+        url: '/amenity',
         method: 'GET',
       }),
       providesTags: ['Amenity'],

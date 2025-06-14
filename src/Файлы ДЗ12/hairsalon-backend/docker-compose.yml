@@ -1,0 +1,46 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: quiz_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - quiz-network
+
+  quiz-backend:
+    image: ghcr.io/alevshinskii/quiz-backend:latest
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__PostgresDB=Host=db;Database=quiz_db;Username=postgres;Password=password
+    depends_on:
+      - db
+    ports:
+      - "9032:9032"
+    networks:
+      - quiz-network
+
+  quiz-frontend:
+    image: ghcr.io/alevshinskii/quiz-frontend:latest
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - quiz-backend
+    networks:
+      - quiz-network
+
+volumes:
+  pgdata:
+
+networks:
+  quiz-network:
+    driver: bridge

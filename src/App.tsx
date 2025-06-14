@@ -6,7 +6,7 @@ import NewAppointmentPage from './components/main/newAppointmentPage';
 import LoginPage from './components/login/loginPage';
 import RegisterPage from './components/register/registerPage';
 import MainPage from './components/main/mainPage';
-import AppointmentDetailsPage from './components/main/appointmentDetailsPage';
+import AppointmentDetailsPage from './components/main/appointmentsDetailsPage';
 import { theme } from './theme';
 import { ThemeProvider } from '@mui/material';
 import { Provider } from 'react-redux';

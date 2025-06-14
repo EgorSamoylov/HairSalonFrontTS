@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -9,20 +9,43 @@ import {
   Box,
   Stack,
 } from '@mui/material';
-import { ThemeProvider } from '@mui/material/styles';
-import { theme } from '../../theme';
+import * as Yup from 'yup';
+import { useFormik } from 'formik';
+import { useLoginMutation } from '../../api/authApiSlice';
+
+// Схема валидации
+const validationSchema = Yup.object({
+  email: Yup.string()
+    .email('Введите корректный email')
+    .required('Обязательное поле'),
+  password: Yup.string()
+    .min(6, 'Пароль должен содержать минимум 6 символов')
+    .required('Обязательное поле'),
+});
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [login] = useLoginMutation();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Здесь будет логика авторизации
-    console.log({ email, password });
-    navigate('/');
-  };
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      try {
+        const response = await login(values).unwrap();
+        if (response.token) {
+          localStorage.setItem('auth_token', response.token);
+          navigate('/');
+        }
+      } catch (error) {
+        console.error('Ошибка входа:', error);
+        formik.setStatus('Неверные учетные данные');
+      }
+    },
+  });
 
   const buttonSx = {
     fontSize: '20px',
@@ -35,7 +58,7 @@ export default function LoginPage() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <div>
       <Box
         sx={{
           backgroundColor: '#adadad',
@@ -43,7 +66,7 @@ export default function LoginPage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          p: 2, // добавляем отступы по краям для мобильных устройств
+          p: 2,
         }}
       >
         <Card
@@ -52,7 +75,7 @@ export default function LoginPage() {
             maxWidth: 500,
             backgroundColor: '#c9c8c8',
             borderRadius: '18px',
-            p: 3, // внутренние отступы карточки
+            p: 3,
           }}
         >
           <CardContent>
@@ -69,31 +92,52 @@ export default function LoginPage() {
               Вход
             </Typography>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={formik.handleSubmit}>
               <Stack spacing={3}>
-                {' '}
-                {/* Используем Stack для вертикального расположения */}
                 <TextField
                   label='Email'
+                  name='email'
                   variant='outlined'
                   fullWidth
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.email && Boolean(formik.errors.email)}
+                  helperText={formik.touched.email && formik.errors.email}
                   required
                   type='email'
                 />
                 <TextField
                   label='Пароль'
+                  name='password'
                   variant='outlined'
                   fullWidth
                   type='password'
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.password && Boolean(formik.errors.password)
+                  }
+                  helperText={formik.touched.password && formik.errors.password}
                   required
                 />
-                <Button type='submit' variant='outlined' sx={buttonSx}>
-                  Войти
+
+                {formik.status && (
+                  <Typography color='error' align='center'>
+                    {formik.status}
+                  </Typography>
+                )}
+
+                <Button
+                  type='submit'
+                  variant='outlined'
+                  sx={buttonSx}
+                  disabled={formik.isSubmitting}
+                >
+                  {formik.isSubmitting ? 'Вход...' : 'Войти'}
                 </Button>
+
                 <Typography variant='body2' align='center'>
                   Нет аккаунта?{' '}
                   <Link
@@ -112,6 +156,6 @@ export default function LoginPage() {
           </CardContent>
         </Card>
       </Box>
-    </ThemeProvider>
+    </div>
   );
 }

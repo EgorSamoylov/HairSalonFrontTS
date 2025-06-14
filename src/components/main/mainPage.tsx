@@ -1,47 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Avatar, Typography } from '@mui/material';
-import { UserDto } from '../../api/models/user';
-import { Roles } from '../../api/models/roles';
+import { Button, Avatar, Typography, CircularProgress } from '@mui/material';
+import { useUserInfoQuery } from '../../api/userApiSlice';
 import '../../App.css';
 import Man from '../../images/Man.jpg';
 
 export default function MainPage() {
-  const currentUser: UserDto = {
-    id: 1,
-    firstName: 'Client',
-    lastName: 'User',
-    role: Roles.User,
-    email: 'client@example.com',
-    phoneNumber: '+1234567890',
-    logoAttachmentUrl: 'https://example.com/client-avatar.jpg',
-  };
-
-  const currentUserName = [currentUser?.firstName, currentUser?.lastName].join(
-    ' '
-  );
-
-  function stringToColor(string: string) {
-    let hash = 0;
-    for (let i = 0; i < string.length; i += 1) {
-      hash = string.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    let color = '#';
-    for (let i = 0; i < 3; i += 1) {
-      const value = (hash >> (i * 8)) & 0xff;
-      color += `00${value.toString(16)}`.slice(-2);
-    }
-    return color;
-  }
-
-  function stringAvatar(name: string) {
-    return {
-      sx: {
-        bgcolor: stringToColor(name),
-      },
-      children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
-    };
-  }
+  // Получаем данные текущего пользователя из API
+  const { data: currentUser, isLoading, isError } = useUserInfoQuery({});
 
   const typographySx = {
     fontFamily: 'Laviossa',
@@ -57,6 +23,57 @@ export default function MainPage() {
     borderColor: '#000000',
     borderRadius: '18px',
   };
+
+  function stringToColor(string: string) {
+    let hash = 0;
+    for (let i = 0; i < string.length; i += 1) {
+      hash = string.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    let color = '#';
+    for (let i = 0; i < 3; i += 1) {
+      const value = (hash >> (i * 8)) & 0xff;
+      color += `00${value.toString(16)}`.slice(-2);
+    }
+    return color;
+  }
+
+  function stringAvatar(name: string) {
+    if (!name || name.split(' ').length < 2) {
+      return {
+        sx: {
+          bgcolor: '#cccccc',
+        },
+        children: 'GU',
+      };
+    }
+    return {
+      sx: {
+        bgcolor: stringToColor(name),
+      },
+      children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
+    };
+  }
+
+  if (isLoading) {
+    return (
+      <div
+        style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}
+      >
+        <CircularProgress />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Typography variant='h6'>Ошибка загрузки данных пользователя</Typography>
+    );
+  }
+
+  const currentUserName = currentUser
+    ? [currentUser.firstName, currentUser.lastName].join(' ')
+    : 'Гость';
+
   return (
     <div className='main'>
       <div className='left-main'>
@@ -69,14 +86,7 @@ export default function MainPage() {
             BARBERSHOP
           </Typography>
 
-          <Typography
-            variant='h1'
-            sx={typographySx}
-            style={{
-              padding: '0px',
-            }}
-            gutterBottom
-          >
+          <Typography variant='h1' sx={{ ...typographySx, p: 0 }} gutterBottom>
             ONLY FOR MEN
           </Typography>
         </div>
@@ -98,7 +108,7 @@ export default function MainPage() {
               </Button>
               <Button
                 component={Link}
-                to={'/login'}
+                to={'/logout'}
                 variant='outlined'
                 sx={buttonSx}
               >
@@ -106,7 +116,7 @@ export default function MainPage() {
               </Button>
               <Avatar
                 {...stringAvatar(currentUserName)}
-                src={currentUser?.logoAttachmentUrl}
+                src={currentUser.logoAttachmentUrl || undefined}
                 style={{ fontSize: '20px', padding: '5px' }}
               />
             </>
@@ -117,6 +127,7 @@ export default function MainPage() {
                 to={'/login'}
                 variant='contained'
                 color='primary'
+                sx={buttonSx}
               >
                 Вход
               </Button>
@@ -125,6 +136,7 @@ export default function MainPage() {
                 to={'/register'}
                 variant='outlined'
                 color='primary'
+                sx={buttonSx}
               >
                 Регистрация
               </Button>

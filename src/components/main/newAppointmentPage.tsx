@@ -12,56 +12,49 @@ import {
   Select,
   Avatar,
   Grid,
+  CircularProgress,
 } from '@mui/material';
-import { AmenityDto } from '../../api/models/amenity';
-import { UserDto } from '../../api/models/user';
+import { useUserInfoQuery } from '../../api/userApiSlice';
+import { useAmenitiesQuery } from '../../api/amenityApiSlice';
+import { useAppointmentsQuery } from '../../api/appointmentApiSlice';
 
 export default function NewAppointmentPage() {
   const navigate = useNavigate();
   const [selectedAmenity, setSelectedAmenity] = useState<number>(0);
   const [notes, setNotes] = useState('');
 
-  const currentUser: UserDto = {
-    id: 1,
-    firstName: 'Client',
-    lastName: 'User',
-    email: 'client@example.com',
-    phoneNumber: '+1234567890',
-    logoAttachmentUrl: 'https://example.com/client-avatar.jpg',
-  };
+  // Получаем данные текущего пользователя
+  const { data: currentUser, isLoading: isUserLoading } = useUserInfoQuery({});
 
-  const amenities: AmenityDto[] = [
-    {
-      id: 1,
-      serviceName: 'Стрижка',
-      description: 'Стильная профессиональная стрижка',
-      durationMinutes: 30,
-      price: 25,
-    },
-    {
-      id: 2,
-      serviceName: 'Окрас волос',
-      description: 'Сервис окраса волос',
-      durationMinutes: 60,
-      price: 50,
-    },
-    {
-      id: 3,
-      serviceName: 'Стильная стрижка',
-      description: 'Специальная стильная стрижка',
-      durationMinutes: 45,
-      price: 35,
-    },
-  ];
+  // Получаем список услуг
+  const { data: amenities, isLoading: isAmenitiesLoading } = useAmenitiesQuery(
+    {}
+  );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Получаем список записей (для создания новой)
+  const { refetch } = useAppointmentsQuery({});
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would submit to your backend
-    console.log({
-      amenityId: selectedAmenity,
-      notes,
-    });
-    navigate('/appointments');
+
+    if (!selectedAmenity || !currentUser?.id) return;
+
+    try {
+      // В реальном приложении здесь будет вызов API для создания записи
+      // Пока просто имитируем успешное создание
+      console.log('Creating appointment with:', {
+        clientId: currentUser.id,
+        serviceId: selectedAmenity,
+        notes,
+      });
+
+      // Обновляем список записей
+      await refetch();
+
+      navigate('/appointments');
+    } catch (error) {
+      console.error('Ошибка при создании записи:', error);
+    }
   };
 
   const buttonSx = {
@@ -71,6 +64,20 @@ export default function NewAppointmentPage() {
     borderColor: '#000000',
     borderRadius: '18px',
   };
+
+  if (isUserLoading || isAmenitiesLoading) {
+    return (
+      <div
+        style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}
+      >
+        <CircularProgress />
+      </div>
+    );
+  }
+
+  if (!currentUser || !amenities) {
+    return <Typography variant='h6'>Ошибка загрузки данных</Typography>;
+  }
 
   return (
     <div className='appointment'>
@@ -104,7 +111,7 @@ export default function NewAppointmentPage() {
                       {amenities.map((amenity) => (
                         <MenuItem key={amenity.id} value={amenity.id}>
                           {amenity.serviceName} (${amenity.price},{' '}
-                          {amenity.durationMinutes} min)
+                          {amenity.durationMinutes} мин)
                         </MenuItem>
                       ))}
                     </Select>
@@ -122,7 +129,7 @@ export default function NewAppointmentPage() {
                       marginBottom: '16px',
                     }}
                   >
-                    <Avatar src={currentUser.logoAttachmentUrl} />
+                    <Avatar src={currentUser.logoAttachmentUrl || undefined} />
                     <Grid ml={2}>
                       <Typography>
                         {currentUser.firstName} {currentUser.lastName}
@@ -138,7 +145,7 @@ export default function NewAppointmentPage() {
                     variant='outlined'
                     fullWidth
                     margin='normal'
-                    value={currentUser.phoneNumber}
+                    value={currentUser.phoneNumber || 'Не указан'}
                     disabled
                   />
 
@@ -169,13 +176,14 @@ export default function NewAppointmentPage() {
                     color='secondary'
                     sx={buttonSx}
                   >
-                    ОТМЕНА
+                    Отмена
                   </Button>
                   <Button
                     type='submit'
                     variant='outlined'
                     color='primary'
                     sx={buttonSx}
+                    disabled={!selectedAmenity}
                   >
                     Записаться
                   </Button>

@@ -6,27 +6,42 @@ import NewAppointmentPage from './components/main/newAppointmentPage';
 import LoginPage from './components/login/loginPage';
 import RegisterPage from './components/register/registerPage';
 import MainPage from './components/main/mainPage';
-import AppointmentDetailsPage from './components/main/AppointmentDetailsPage';
+import AppointmentDetailsPage from './components/main/appointmentDetailsPage';
 import { theme } from './theme';
 import { ThemeProvider } from '@mui/material';
+import { Provider } from 'react-redux';
+import store from './store/store';
+import AuthProtected from './components/AuthProtected';
+import LogoutPage from './components/logout/logoutPage';
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <Router>
-        <Routes>
-          <Route path='/' element={<MainPage />} />
-          <Route path='/appointments' element={<AppointmentsPage />} />
-          <Route path='/appointments/new' element={<NewAppointmentPage />} />
-          <Route path='/login' element={<LoginPage />} />
-          <Route path='/register' element={<RegisterPage />} />
-          <Route
-            path='/appointments/:id'
-            element={<AppointmentDetailsPage />}
-          />
-        </Routes>
-      </Router>
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <Router>
+          <Routes>
+            {/* Public routes */}
+            <Route path='/login' element={<LoginPage />} />
+            <Route path='/register' element={<RegisterPage />} />
+
+            {/* Protected routes - require authentication */}
+            <Route element={<AuthProtected />}>
+              <Route path='/' element={<MainPage />} />
+              <Route path='/appointments' element={<AppointmentsPage />} />
+              <Route
+                path='/appointments/new'
+                element={<NewAppointmentPage />}
+              />
+              <Route path='/logout' element={<LogoutPage />} />
+              <Route
+                path='/appointments/:id'
+                element={<AppointmentDetailsPage />}
+              />
+            </Route>
+          </Routes>
+        </Router>
+      </ThemeProvider>
+    </Provider>
   );
 }
 

@@ -26,11 +26,14 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const [register] = useRegisterMutation({});
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(e);
-    register(formData);
-    navigate('/');
+    try {
+      await register(formData).unwrap();
+      navigate('/');
+    } catch (err) {
+      console.error('Ошибка регистрации:', err);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

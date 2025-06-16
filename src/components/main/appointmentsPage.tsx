@@ -11,6 +11,8 @@ import {
 import { AppointmentDto } from '../../api/models/appointment';
 import { useAppointmentsQuery } from '../../api/appointmentApiSlice';
 import { EmptyState } from '../emptyState';
+import { ru } from 'date-fns/locale';
+import { format } from 'date-fns';
 
 export default function AppointmentsPage() {
   const { data: appointments, isLoading: isAppointmentsLoading } =
@@ -108,7 +110,13 @@ function AppointmentCard({ appointment }: AppointmentCardProps) {
             {appointment.service?.serviceName}
           </Typography>
           <Typography variant='body2' color='text.secondary'>
-            Продолжительность: {appointment.service?.durationMinutes} мин
+            Дата записи:{' '}
+            {appointment.appointmentDateTime &&
+              format(
+                new Date(appointment.appointmentDateTime),
+                'dd.MM.yyyy HH:mm',
+                { locale: ru }
+              )}
           </Typography>
           <Typography variant='body1' mt={1}>
             Примечание: {appointment.notes}
@@ -120,6 +128,7 @@ function AppointmentCard({ appointment }: AppointmentCardProps) {
             gap: '8px',
             justifyContent: 'flex-end',
             marginTop: '10px',
+            width: '700px',
           }}
         >
           <Button

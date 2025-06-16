@@ -2,17 +2,55 @@ import React from 'react';
 import { CircularProgress, Grid, Typography } from '@mui/material';
 import { useLogoutMutation } from '../../api/authApiSlice';
 import { Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function LogoutPage() {
-  const [logout, { isLoading }] = useLogoutMutation();
+  const [logout] = useLogoutMutation();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
 
   useEffect(() => {
     const performLogout = async () => {
-      await logout({}).unwrap();
+      try {
+        await logout().unwrap();
+      } catch (err) {
+        console.error('Ошибка при выходе:', err);
+        setError('Не удалось выйти из системы');
+      } finally {
+        setIsLoading(false);
+        // Устанавливаем таймер для перенаправления
+        const timer = setTimeout(() => setShouldRedirect(true), 3000);
+        // eslint-disable-next-line no-unsafe-finally
+        return () => clearTimeout(timer); // Очистка таймера при размонтировании
+      }
     };
+
     performLogout();
   }, [logout]);
+
+  if (shouldRedirect) {
+    return <Navigate to='/login' replace />;
+  }
+
+  if (error) {
+    return (
+      <Grid
+        container
+        direction='column'
+        alignItems='center'
+        justifyContent='center'
+        style={{ minHeight: '100vh' }}
+      >
+        <Typography variant='body1' color='error'>
+          {error}
+        </Typography>
+        <Typography variant='body2'>
+          Вы будете перенаправлены на страницу входа...
+        </Typography>
+      </Grid>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -24,7 +62,7 @@ export default function LogoutPage() {
         style={{ minHeight: '100vh' }}
       >
         <CircularProgress />
-        <Typography variant='body1'>Logging out...</Typography>
+        <Typography variant='body1'>Выход из системы...</Typography>
       </Grid>
     );
   }

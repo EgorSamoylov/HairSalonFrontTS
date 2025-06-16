@@ -5,10 +5,6 @@ export type LoginRequest = {
   password: string;
 };
 
-export type LoginResponse = {
-  token: string;
-};
-
 export type RegisterRequest = {
   firstName: string;
   lastName: string;
@@ -16,41 +12,37 @@ export type RegisterRequest = {
   password: string;
 };
 
-export type RegisterResponse = object;
-
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<LoginResponse, LoginRequest>({
+    login: builder.mutation<void, LoginRequest>({
       query: (args) => ({
         url: '/auth/login',
         method: 'POST',
         body: args,
+        credentials: 'include', // Важно для работы с cookie
       }),
-      async onQueryStarted(arg, { queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          if (data.token) {
-            localStorage.setItem('auth_token', data.token);
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      },
       invalidatesTags: ['User'],
     }),
-    register: builder.mutation<RegisterResponse, RegisterRequest>({
+    register: builder.mutation<void, RegisterRequest>({
       query: (args) => ({
         url: '/auth/register',
         method: 'POST',
         body: args,
+        credentials: 'include',
       }),
       invalidatesTags: ['User'],
     }),
-    logout: builder.mutation<object, object>({
+    logout: builder.mutation<void, void>({
       query: () => ({
         url: '/auth/logout',
         method: 'POST',
+        credentials: 'include',
       }),
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      async onQueryStarted(arg, { dispatch }) {
+        // Очищаем localStorage при выходе
+        localStorage.removeItem('auth_token');
+      },
       invalidatesTags: ['User'],
     }),
   }),

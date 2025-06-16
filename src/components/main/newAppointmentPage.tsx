@@ -13,48 +13,66 @@ import {
   Avatar,
   Grid,
   CircularProgress,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import { useUserInfoQuery } from '../../api/userApiSlice';
 import { useAmenitiesQuery } from '../../api/amenityApiSlice';
-import { useAppointmentsQuery } from '../../api/appointmentApiSlice';
+import {
+  useAppointmentsQuery,
+  useCreateAppointmentMutation,
+} from '../../api/appointmentApiSlice';
 
 export default function NewAppointmentPage() {
   const navigate = useNavigate();
   const [selectedAmenity, setSelectedAmenity] = useState<number>(0);
+  const [appointmentDate, setAppointmentDate] = useState<string>(
+    new Date().toISOString()
+  );
   const [notes, setNotes] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-  // Получаем данные текущего пользователя
+  const [createAppointment, { isLoading: isSubmitting }] =
+    useCreateAppointmentMutation();
   const { data: currentUser, isLoading: isUserLoading } = useUserInfoQuery({});
-
-  // Получаем список услуг
   const { data: amenities, isLoading: isAmenitiesLoading } = useAmenitiesQuery(
     {}
   );
-
-  // Получаем список записей (для создания новой)
   const { refetch } = useAppointmentsQuery({});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
 
-    if (!selectedAmenity || !currentUser?.id) return;
+    if (!selectedAmenity || !currentUser?.id) {
+      setError('Пожалуйста, выберите услугу');
+      return;
+    }
 
     try {
-      // В реальном приложении здесь будет вызов API для создания записи
-      // Пока просто имитируем успешное создание
-      console.log('Creating appointment with:', {
+      const appointmentData = {
         clientId: currentUser.id,
-        serviceId: selectedAmenity,
-        notes,
-      });
+        employeeId: 1, // Можно добавить выбор парикмахера
+        amenityId: selectedAmenity,
+        appointmentDateTime: new Date(appointmentDate),
+        notes: notes,
+      };
 
-      // Обновляем список записей
+      await createAppointment(appointmentData).unwrap();
+
+      setSuccess(true);
       await refetch();
-
-      navigate('/appointments');
-    } catch (error) {
-      console.error('Ошибка при создании записи:', error);
+      setTimeout(() => navigate('/appointments'), 1500);
+    } catch (err) {
+      console.error('Ошибка при создании записи:', err);
+      setError(err instanceof Error ? err.message : 'Неизвестная ошибка');
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setError(null);
+    setSuccess(false);
   };
 
   const buttonSx = {
@@ -103,7 +121,7 @@ export default function NewAppointmentPage() {
                       labelId='amenity-label'
                       value={selectedAmenity}
                       onChange={(e) =>
-                        setSelectedAmenity(e.target.value as number)
+                        setSelectedAmenity(Number(e.target.value))
                       }
                       label='Услуга'
                       required
@@ -116,6 +134,22 @@ export default function NewAppointmentPage() {
                       ))}
                     </Select>
                   </FormControl>
+                </div>
+
+                <div>
+                  <TextField
+                    label='Дата и время записи'
+                    type='datetime-local'
+                    fullWidth
+                    margin='normal'
+                    value={appointmentDate.substring(0, 16)}
+                    onChange={(e) =>
+                      setAppointmentDate(new Date(e.target.value).toISOString())
+                    }
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
                 </div>
 
                 <div>
@@ -175,6 +209,7 @@ export default function NewAppointmentPage() {
                     variant='outlined'
                     color='secondary'
                     sx={buttonSx}
+                    disabled={isSubmitting}
                   >
                     Отмена
                   </Button>
@@ -183,9 +218,13 @@ export default function NewAppointmentPage() {
                     variant='outlined'
                     color='primary'
                     sx={buttonSx}
-                    disabled={!selectedAmenity}
+                    disabled={!selectedAmenity || isSubmitting}
                   >
-                    Записаться
+                    {isSubmitting ? (
+                      <CircularProgress size={24} />
+                    ) : (
+                      'Записаться'
+                    )}
                   </Button>
                 </div>
               </div>
@@ -193,6 +232,34 @@ export default function NewAppointmentPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity='error'
+          sx={{ width: '100%' }}
+        >
+          {error}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={success}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity='success'
+          sx={{ width: '100%' }}
+        >
+          Запись успешно создана!
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

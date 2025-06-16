@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   Button,
@@ -8,40 +8,49 @@ import {
   Avatar,
   Grid,
   CircularProgress,
+  Box,
 } from '@mui/material';
-import { AppointmentDto } from '../../api/models/appointment';
+import {
+  useGetAppointmentByIdQuery,
+  useGetClientByIdQuery,
+  useGetEmployeeByIdQuery,
+  useGetAmenityByIdQuery,
+} from '../../api/apiSlice';
 
 export default function AppointmentDetailsPage() {
   const { id } = useParams<{ id: string }>();
 
-  const [appointment, setAppointment] = useState<AppointmentDto>();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+  // Получаем основную запись
+  const {
+    data: appointment,
+    isLoading: isAppointmentLoading,
+    isError: isAppointmentError,
+  } = useGetAppointmentByIdQuery(Number(id));
 
-  const fetchAppointmentById = async (id: number) => {
-    try {
-      const response = await fetch(`/api/appointments/${id}`);
-      if (!response.ok) {
-        throw new Error('Ошибка при загрузке информации о записи');
-      }
-      return await response.json();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      setIsError(true);
-      return null;
-    }
-  };
+  // Получаем связанные данные
+  const {
+    data: client,
+    isLoading: isClientLoading,
+    isError: isClientError,
+  } = useGetClientByIdQuery(appointment?.clientId ?? 0, {
+    skip: !appointment?.clientId,
+  });
 
-  useEffect(() => {
-    const loadAppointment = async () => {
-      setIsLoading(true);
-      const data = await fetchAppointmentById(Number(id));
-      setAppointment(data);
-      setIsLoading(false);
-    };
+  const {
+    data: employee,
+    isLoading: isEmployeeLoading,
+    isError: isEmployeeError,
+  } = useGetEmployeeByIdQuery(appointment?.employeeId ?? 0, {
+    skip: !appointment?.employeeId,
+  });
 
-    loadAppointment();
-  }, [id]);
+  const {
+    data: amenity,
+    isLoading: isAmenityLoading,
+    isError: isAmenityError,
+  } = useGetAmenityByIdQuery(appointment?.serviceId ?? 0, {
+    skip: !appointment?.serviceId,
+  });
 
   const buttonSx = {
     fontSize: '20px',
@@ -51,30 +60,41 @@ export default function AppointmentDetailsPage() {
     borderRadius: '18px',
   };
 
+  const isLoading =
+    isAppointmentLoading ||
+    isClientLoading ||
+    isEmployeeLoading ||
+    isAmenityLoading;
+  const isError =
+    isAppointmentError || isClientError || isEmployeeError || isAmenityError;
+
   if (isLoading) {
-    return <CircularProgress />;
+    return (
+      <Box display='flex' justifyContent='center' padding='20px'>
+        <CircularProgress />
+      </Box>
+    );
   }
 
   if (isError || !appointment) {
     return (
-      <div style={{ padding: '20px' }}>
+      <Box padding='20px'>
         <Typography variant='h4'>Запись не найдена</Typography>
         <Button
           component={Link}
           to='/appointments'
           variant='outlined'
-          style={{ marginTop: '20px' }}
-          sx={buttonSx}
+          sx={{ marginTop: '20px', ...buttonSx }}
         >
           Вернуться к списку записей
         </Button>
-      </div>
+      </Box>
     );
   }
 
   return (
-    <div className='appointment'>
-      <div className='appointment-content'>
+    <Box className='appointment'>
+      <Box className='appointment-content'>
         <Typography variant='h3' align='center' gutterBottom>
           Детали записи
         </Typography>
@@ -82,7 +102,7 @@ export default function AppointmentDetailsPage() {
         <Grid mb={3}>
           <Button
             component={Link}
-            to={'/appointments'}
+            to='/appointments'
             variant='outlined'
             sx={buttonSx}
           >
@@ -91,49 +111,71 @@ export default function AppointmentDetailsPage() {
         </Grid>
 
         <Card>
-          <CardContent style={{ backgroundColor: '#c9c8c8' }}>
+          <CardContent sx={{ backgroundColor: '#c9c8c8' }}>
+            {/* Информация об услуге */}
             <Grid mb={3}>
               <Typography variant='h5' component='div'>
-                {appointment.service?.serviceName}
+                {amenity?.serviceName || 'Услуга не указана'}
               </Typography>
               <Typography variant='body2' color='text.secondary'>
                 Дата и время:{' '}
                 {appointment.appointmentDateTime &&
-                  new Date(appointment.appointmentDateTime).toLocaleString()}
+                  new Date(appointment.appointmentDateTime).toLocaleString(
+                    'ru-RU',
+                    {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    }
+                  )}
               </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                Продолжительность: {appointment.service?.durationMinutes} минут
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                Стоимость: ${appointment.service?.price}
-              </Typography>
+              {amenity && (
+                <>
+                  <Typography variant='body2' color='text.secondary'>
+                    Продолжительность: {amenity.durationMinutes || '—'} минут
+                  </Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    Стоимость: ${amenity.price || '—'}
+                  </Typography>
+                </>
+              )}
             </Grid>
 
+            {/* Информация о клиенте */}
             <Grid mb={3}>
               <Typography variant='h6'>Клиент</Typography>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  marginTop: '8px',
-                }}
-              >
-                <Avatar src={appointment.client?.logoAttachmentUrl} />
+              <Box display='flex' alignItems='center' mt={1}>
+                <Avatar src={client?.logoAttachmentUrl} />
                 <Grid ml={2}>
                   <Typography>
-                    {appointment.client?.firstName}{' '}
-                    {appointment.client?.lastName}
+                    {client?.firstName} {client?.lastName}
                   </Typography>
                   <Typography variant='body2' color='text.secondary'>
-                    {appointment.client?.email}
+                    {client?.email || 'Email не указан'}
                   </Typography>
                   <Typography variant='body2' color='text.secondary'>
-                    {appointment.client?.phoneNumber}
+                    {client?.phoneNumber || 'Телефон не указан'}
                   </Typography>
                 </Grid>
-              </div>
+              </Box>
             </Grid>
 
+            {/* Информация о парикмахере */}
+            <Grid mb={3}>
+              <Typography variant='h6'>Парикмахер</Typography>
+              <Box display='flex' alignItems='center' mt={1}>
+                <Avatar src={employee?.logoAttachmentUrl} />
+                <Grid ml={2}>
+                  <Typography>
+                    {employee?.firstName} {employee?.lastName}
+                  </Typography>
+                </Grid>
+              </Box>
+            </Grid>
+
+            {/* Примечание */}
             <Grid mb={3}>
               <Typography variant='h6'>Примечание</Typography>
               <Typography variant='body1' mt={1}>
@@ -141,20 +183,14 @@ export default function AppointmentDetailsPage() {
               </Typography>
             </Grid>
 
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                marginTop: '20px',
-              }}
-            >
+            <Box display='flex' justifyContent='flex-end' mt={3}>
               <Button variant='outlined' color='secondary' sx={buttonSx}>
                 Отменить запись
               </Button>
-            </div>
+            </Box>
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

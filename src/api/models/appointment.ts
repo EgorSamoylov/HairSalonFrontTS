@@ -6,6 +6,9 @@ export type AppointmentDto = {
   client?: UserDto;
   employee?: UserDto;
   service?: AmenityDto;
+  clientId: number;
+  employeeId: number;
+  serviceId: number;
   appointmentDateTime?: Date;
   notes?: string;
 };

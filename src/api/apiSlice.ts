@@ -4,7 +4,7 @@ import { UserDto } from './models/user';
 import { AmenityDto } from './models/amenity';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.REACT_APP_API_URL ?? 'http://158.160.177.163:9032',
+  baseUrl: process.env.REACT_APP_API_URL ?? 'http://158.160.177.163',
   credentials: 'include',
 });
 

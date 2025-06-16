@@ -70,5 +70,5 @@ jobs:
           set -e
           cd /home/user/app
           export COMPOSE_INTERACTIVE_NO_CLI=1
-          sudo docker-compose pull hairsalonfrontts
-          sudo docker-compose up -d hairsalonfrontts
+          sudo docker-compose pull frontend
+          sudo docker-compose up -d frontend

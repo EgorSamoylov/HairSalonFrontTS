@@ -1,4 +1,5 @@
 import { apiSlice } from './apiSlice';
+import { Roles } from './models/roles';
 
 export type UserInfoRequest = object;
 
@@ -9,6 +10,7 @@ export type UserInfoResponse = {
   email: string;
   phoneNumber: string;
   logoAttachmentUrl: string | null;
+  role: Roles;
 };
 
 export const userApiSlice = apiSlice.injectEndpoints({

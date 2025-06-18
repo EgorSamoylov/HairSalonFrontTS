@@ -45,8 +45,30 @@ export const authApiSlice = apiSlice.injectEndpoints({
       },
       invalidatesTags: ['User'],
     }),
+    registerEmployee: builder.mutation<
+      void,
+      {
+        firstName: string;
+        lastName: string;
+        email: string;
+        password: string;
+        phoneNumber: string;
+      }
+    >({
+      query: (args) => ({
+        url: '/auth/register-employee',
+        method: 'POST',
+        body: args,
+        credentials: 'include',
+      }),
+      invalidatesTags: ['User'],
+    }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useLogoutMutation } =
-  authApiSlice;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useLogoutMutation,
+  useRegisterEmployeeMutation,
+} = authApiSlice;

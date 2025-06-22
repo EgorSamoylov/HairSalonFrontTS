@@ -9,14 +9,34 @@ import {
   Card,
   CardContent,
 } from '@mui/material';
-import { useUserInfoQuery } from '../../api/userApiSlice';
+// import { useUserInfoQuery } from '../../api/userApiSlice';
 import {
-  useGetClientAppointmentsQuery,
+  //   useGetClientAppointmentsQuery,
+  useGetUserAppointmentsQuery,
   useUpdateAppointmentStatusMutation,
 } from '../../api/appointmentApiSlice';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
+
+const tabStyles = {
+  fontFamily: 'Neue Machina',
+  fontSize: '0.875rem',
+};
+
+const buttonSx = {
+  fontSize: '16px',
+  fontFamily: 'Neue Machina',
+  color: '#000000',
+  borderColor: '#000000',
+  borderRadius: '18px',
+  px: 3,
+  py: 1,
+  '&:hover': {
+    backgroundColor: '#e0e0e0',
+    borderColor: '#000000',
+  },
+};
 
 function TabPanel(props: {
   children: React.ReactNode;
@@ -40,10 +60,11 @@ function TabPanel(props: {
 
 export default function ClientAppointments() {
   const [value, setValue] = React.useState(0);
-  const { data: user } = useUserInfoQuery({});
-  const { data: appointments = [], isLoading } = useGetClientAppointmentsQuery(
-    user?.id || 0
-  );
+  //   const { data: user } = useUserInfoQuery({});
+  //   const { data: appointments = [], isLoading } = useGetClientAppointmentsQuery(
+  //     user?.id || 0
+  //   );
+  const { data: appointments = [], isLoading } = useGetUserAppointmentsQuery();
   const [updateStatus] = useUpdateAppointmentStatusMutation();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -66,20 +87,6 @@ export default function ClientAppointments() {
     updateStatus({ id, isCancelled: true });
   };
 
-  const buttonSx = {
-    fontSize: '16px',
-    fontFamily: 'Neue Machina',
-    color: '#000000',
-    borderColor: '#000000',
-    borderRadius: '18px',
-    px: 3,
-    py: 1,
-    '&:hover': {
-      backgroundColor: '#e0e0e0',
-      borderColor: '#000000',
-    },
-  };
-
   return (
     <Box
       sx={{
@@ -92,7 +99,6 @@ export default function ClientAppointments() {
       }}
     >
       <Box sx={{ width: '100%', maxWidth: 800 }}>
-        {/* Заголовок по центру с кнопкой под ним слева */}
         <Box sx={{ mb: 3, textAlign: 'center' }}>
           <Typography
             variant='h3'
@@ -134,25 +140,22 @@ export default function ClientAppointments() {
                 <Tab
                   label='Предстоящие'
                   sx={{
-                    fontFamily: 'Neue Machina',
+                    ...tabStyles,
                     color: value === 0 ? '#413f3f' : 'inherit',
-                    fontSize: '0.875rem',
                   }}
                 />
                 <Tab
                   label='Прошедшие'
                   sx={{
-                    fontFamily: 'Neue Machina',
+                    ...tabStyles,
                     color: value === 1 ? '#413f3f' : 'inherit',
-                    fontSize: '0.875rem',
                   }}
                 />
                 <Tab
                   label='Отмененные'
                   sx={{
-                    fontFamily: 'Neue Machina',
+                    ...tabStyles,
                     color: value === 2 ? '#413f3f' : 'inherit',
-                    fontSize: '0.875rem',
                   }}
                 />
               </Tabs>

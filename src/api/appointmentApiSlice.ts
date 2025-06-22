@@ -62,6 +62,10 @@ export const appointmentApiSlice = apiSlice.injectEndpoints({
       query: (clientId) => `/Appointment/client/${clientId}`,
       providesTags: ['Appointment'],
     }),
+    getUserAppointments: builder.query<AppointmentDto[], void>({
+      query: () => '/Appointment/user-appointments',
+      providesTags: ['Appointment'],
+    }),
   }),
 });
 
@@ -72,4 +76,5 @@ export const {
   useUpdateAppointmentStatusMutation,
   useGetEmployeeAppointmentsQuery,
   useGetClientAppointmentsQuery,
+  useGetUserAppointmentsQuery,
 } = appointmentApiSlice;

@@ -13,19 +13,7 @@ import {
   Alert,
 } from '@mui/material';
 import { useRegisterEmployeeMutation } from '../../api/authApiSlice';
-
-function stringToColor(string: string) {
-  let hash = 0;
-  for (let i = 0; i < string.length; i += 1) {
-    hash = string.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  let color = '#';
-  for (let i = 0; i < 3; i += 1) {
-    const value = (hash >> (i * 8)) & 0xff;
-    color += `00${value.toString(16)}`.slice(-2);
-  }
-  return color;
-}
+import { stringToColor } from '../../utils/stringToColor';
 
 export default function RegisterEmployeePage() {
   const [formData, setFormData] = useState({
@@ -36,19 +24,41 @@ export default function RegisterEmployeePage() {
     password: '',
     confirmPassword: '',
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
   const [registerEmployee, { isLoading }] = useRegisterEmployeeMutation();
 
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.firstName) newErrors.firstName = 'Введите имя';
+    if (!formData.lastName) newErrors.lastName = 'Введите фамилию';
+    if (!formData.email) {
+      newErrors.email = 'Введите email';
+    } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      newErrors.email = 'Введите корректный email';
+    }
+    if (!formData.phoneNumber) newErrors.phoneNumber = 'Введите телефон';
+    if (!formData.password) {
+      newErrors.password = 'Введите пароль';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Пароль должен быть не менее 6 символов';
+    }
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Пароли не совпадают';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Пароли не совпадают');
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       await registerEmployee({
@@ -70,6 +80,13 @@ export default function RegisterEmployeePage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   const buttonSx = {
@@ -127,7 +144,7 @@ export default function RegisterEmployeePage() {
             </Alert>
           )}
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <Stack spacing={3}>
               <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                 <Avatar
@@ -152,6 +169,8 @@ export default function RegisterEmployeePage() {
                   fullWidth
                   value={formData.firstName}
                   onChange={handleChange}
+                  error={!!errors.firstName}
+                  helperText={errors.firstName}
                   required
                 />
                 <TextField
@@ -161,6 +180,8 @@ export default function RegisterEmployeePage() {
                   fullWidth
                   value={formData.lastName}
                   onChange={handleChange}
+                  error={!!errors.lastName}
+                  helperText={errors.lastName}
                   required
                 />
               </Box>
@@ -173,6 +194,8 @@ export default function RegisterEmployeePage() {
                 type='email'
                 value={formData.email}
                 onChange={handleChange}
+                error={!!errors.email}
+                helperText={errors.email}
                 required
               />
 
@@ -183,6 +206,8 @@ export default function RegisterEmployeePage() {
                 fullWidth
                 value={formData.phoneNumber}
                 onChange={handleChange}
+                error={!!errors.phoneNumber}
+                helperText={errors.phoneNumber}
                 required
               />
 
@@ -194,6 +219,8 @@ export default function RegisterEmployeePage() {
                 type='password'
                 value={formData.password}
                 onChange={handleChange}
+                error={!!errors.password}
+                helperText={errors.password}
                 required
               />
 
@@ -205,6 +232,8 @@ export default function RegisterEmployeePage() {
                 type='password'
                 value={formData.confirmPassword}
                 onChange={handleChange}
+                error={!!errors.confirmPassword}
+                helperText={errors.confirmPassword}
                 required
               />
 

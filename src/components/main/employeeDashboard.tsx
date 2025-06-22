@@ -9,9 +9,10 @@ import {
   Card,
   CardContent,
 } from '@mui/material';
-import { useUserInfoQuery } from '../../api/userApiSlice';
+// import { useUserInfoQuery } from '../../api/userApiSlice';
 import {
-  useGetEmployeeAppointmentsQuery,
+  //   useGetEmployeeAppointmentsQuery,
+  useGetUserAppointmentsQuery,
   useUpdateAppointmentStatusMutation,
 } from '../../api/appointmentApiSlice';
 import { AppointmentDto } from '../../api/models/appointment';
@@ -111,9 +112,10 @@ function AppointmentCard({
 // Основной компонент панели сотрудника
 export default function EmployeeDashboard() {
   const [value, setValue] = React.useState(0);
-  const { data: user } = useUserInfoQuery({});
-  const { data: appointments = [], isLoading } =
-    useGetEmployeeAppointmentsQuery(user?.id || 0);
+  //   const { data: user } = useUserInfoQuery({});
+  //   const { data: appointments = [], isLoading } =
+  //     useGetEmployeeAppointmentsQuery(user?.id || 0);
+  const { data: appointments = [], isLoading } = useGetUserAppointmentsQuery();
   const [updateStatus] = useUpdateAppointmentStatusMutation();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {

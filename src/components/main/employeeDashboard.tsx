@@ -9,16 +9,15 @@ import {
   Card,
   CardContent,
 } from '@mui/material';
-// import { useUserInfoQuery } from '../../api/userApiSlice';
 import {
-  //   useGetEmployeeAppointmentsQuery,
-  useGetUserAppointmentsQuery,
+  useGetEmployeeAppointmentsQuery,
   useUpdateAppointmentStatusMutation,
 } from '../../api/appointmentApiSlice';
 import { AppointmentDto } from '../../api/models/appointment';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
+import { useUserInfoQuery } from '../../api/userApiSlice';
 
 // Компонент для отображения вкладок
 function TabPanel(props: {
@@ -112,10 +111,9 @@ function AppointmentCard({
 // Основной компонент панели сотрудника
 export default function EmployeeDashboard() {
   const [value, setValue] = React.useState(0);
-  //   const { data: user } = useUserInfoQuery({});
-  //   const { data: appointments = [], isLoading } =
-  //     useGetEmployeeAppointmentsQuery(user?.id || 0);
-  const { data: appointments = [], isLoading } = useGetUserAppointmentsQuery();
+  const { data: user } = useUserInfoQuery({});
+  const { data: appointments = [], isLoading } =
+    useGetEmployeeAppointmentsQuery(user?.id || 0);
   const [updateStatus] = useUpdateAppointmentStatusMutation();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {

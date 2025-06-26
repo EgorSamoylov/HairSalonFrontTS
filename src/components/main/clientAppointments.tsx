@@ -9,15 +9,14 @@ import {
   Card,
   CardContent,
 } from '@mui/material';
-// import { useUserInfoQuery } from '../../api/userApiSlice';
 import {
-  //   useGetClientAppointmentsQuery,
-  useGetUserAppointmentsQuery,
+  useGetClientAppointmentsQuery,
   useUpdateAppointmentStatusMutation,
 } from '../../api/appointmentApiSlice';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
+import { useUserInfoQuery } from '../../api/userApiSlice';
 
 const tabStyles = {
   fontFamily: 'Neue Machina',
@@ -60,11 +59,10 @@ function TabPanel(props: {
 
 export default function ClientAppointments() {
   const [value, setValue] = React.useState(0);
-  //   const { data: user } = useUserInfoQuery({});
-  //   const { data: appointments = [], isLoading } = useGetClientAppointmentsQuery(
-  //     user?.id || 0
-  //   );
-  const { data: appointments = [], isLoading } = useGetUserAppointmentsQuery();
+  const { data: user } = useUserInfoQuery({});
+  const { data: appointments = [], isLoading } = useGetClientAppointmentsQuery(
+    user?.id || 0
+  );
   const [updateStatus] = useUpdateAppointmentStatusMutation();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {

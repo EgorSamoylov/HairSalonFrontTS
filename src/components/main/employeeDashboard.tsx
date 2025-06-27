@@ -10,14 +10,15 @@ import {
   CardContent,
 } from '@mui/material';
 import {
-  useGetEmployeeAppointmentsQuery,
+  useGetUserAppointmentsQuery,
   useUpdateAppointmentStatusMutation,
 } from '../../api/appointmentApiSlice';
 import { AppointmentDto } from '../../api/models/appointment';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useUserInfoQuery } from '../../api/userApiSlice';
+import { Roles } from '../../api/models/roles';
 
 // Компонент для отображения вкладок
 function TabPanel(props: {
@@ -111,14 +112,33 @@ function AppointmentCard({
 // Основной компонент панели сотрудника
 export default function EmployeeDashboard() {
   const [value, setValue] = React.useState(0);
-  const { data: user } = useUserInfoQuery({});
-  const { data: appointments = [], isLoading } =
-    useGetEmployeeAppointmentsQuery(user?.id || 0);
+  const navigate = useNavigate();
+
+  // Получаем информацию о пользователе
+  const { data: user, isLoading: isUserLoading } = useUserInfoQuery({});
+
+  // Получаем записи только если пользователь Admin или Employee
+  const { data: appointments = [], isLoading: isAppointmentsLoading } =
+    user?.role === Roles.Admin || user?.role === Roles.Employee
+      ? useGetUserAppointmentsQuery()
+      : { data: [], isLoading: false };
+
   const [updateStatus] = useUpdateAppointmentStatusMutation();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  // Редирект если роль не подходит
+  React.useEffect(() => {
+    if (
+      !isUserLoading &&
+      user?.role &&
+      ![Roles.Admin, Roles.Employee].includes(user.role)
+    ) {
+      navigate('/');
+    }
+  }, [user, isUserLoading, navigate]);
 
   // Фильтрация записей
   const upcomingAppointments = appointments.filter(
@@ -129,7 +149,6 @@ export default function EmployeeDashboard() {
   );
 
   const completedAppointments = appointments.filter((appt) => appt.isCompleted);
-
   const cancelledAppointments = appointments.filter((appt) => appt.isCancelled);
 
   const handleComplete = (id: number) => {
@@ -149,6 +168,24 @@ export default function EmployeeDashboard() {
     mb: 2,
   };
 
+  // Если роль не подходит, показываем сообщение или ничего (редирект сработает)
+  if (
+    !isUserLoading &&
+    user?.role &&
+    ![Roles.Admin, Roles.Employee].includes(user.role)
+  ) {
+    return (
+      <Box sx={{ width: '100%', p: 3, textAlign: 'center' }}>
+        <Typography variant='h4' sx={{ mt: 4 }}>
+          У вас нет доступа к этой странице
+        </Typography>
+        <Button component={Link} to='/' variant='outlined' sx={{ mt: 2 }}>
+          На главную
+        </Button>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ width: '100%', p: 3 }}>
       <Typography
@@ -167,7 +204,7 @@ export default function EmployeeDashboard() {
         </Tabs>
       </Box>
 
-      {isLoading ? (
+      {isAppointmentsLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
           <CircularProgress />
         </Box>

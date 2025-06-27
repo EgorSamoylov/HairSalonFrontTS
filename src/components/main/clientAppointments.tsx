@@ -17,6 +17,7 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { Link } from 'react-router-dom';
 import { useUserInfoQuery } from '../../api/userApiSlice';
+import { Roles } from '../../api/models/roles';
 
 const tabStyles = {
   fontFamily: 'Neue Machina',
@@ -60,9 +61,23 @@ function TabPanel(props: {
 export default function ClientAppointments() {
   const [value, setValue] = React.useState(0);
   const { data: user } = useUserInfoQuery({});
-  const { data: appointments = [], isLoading } = useGetClientAppointmentsQuery(
-    user?.id || 0
-  );
+
+  // Используем хук conditionally, только если пользователь Admin
+  const { data: adminAppointments = [], isLoading: isAdminLoading } =
+    user?.role === Roles.Admin || user?.role === Roles.User
+      ? useGetClientAppointmentsQuery(user?.id || 0)
+      : { data: [], isLoading: false };
+
+  // Для обычных пользователей используем пустой массив
+  const appointments =
+    user?.role === Roles.Admin || user?.role === Roles.User
+      ? adminAppointments
+      : [];
+  const isLoading =
+    user?.role === Roles.Admin || user?.role === Roles.User
+      ? isAdminLoading
+      : false;
+
   const [updateStatus] = useUpdateAppointmentStatusMutation();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -84,6 +99,42 @@ export default function ClientAppointments() {
   const handleCancel = (id: number) => {
     updateStatus({ id, isCancelled: true });
   };
+
+  // Если роль не User или Admin, показываем сообщение об отсутствии доступа
+  if (user?.role && ![Roles.User, Roles.Admin].includes(user.role)) {
+    return (
+      <Box
+        sx={{
+          backgroundColor: '#adadad',
+          minHeight: '100vh',
+          p: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography
+          variant='h4'
+          sx={{ color: '#413f3f', fontFamily: 'Laviossa' }}
+        >
+          У вас нет доступа к этой странице
+        </Typography>
+        <Button
+          component={Link}
+          to='/'
+          variant='outlined'
+          sx={{
+            ...buttonSx,
+            backgroundColor: '#c9c8c8',
+            mt: 2,
+          }}
+        >
+          На главную
+        </Button>
+      </Box>
+    );
+  }
 
   return (
     <Box

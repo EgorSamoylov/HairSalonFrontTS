@@ -19,7 +19,7 @@ export const authApiSlice = apiSlice.injectEndpoints({
         url: '/auth/login',
         method: 'POST',
         body: args,
-        credentials: 'include', // Важно для работы с cookie
+        credentials: 'include',
       }),
       invalidatesTags: ['User'],
     }),
@@ -40,13 +40,42 @@ export const authApiSlice = apiSlice.injectEndpoints({
       }),
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       async onQueryStarted(arg, { dispatch }) {
-        // Очищаем localStorage при выходе
         localStorage.removeItem('auth_token');
       },
       invalidatesTags: ['User'],
     }),
+    registerEmployee: builder.mutation<
+      void,
+      {
+        firstName: string;
+        lastName: string;
+        email: string;
+        password: string;
+        phoneNumber: string;
+      }
+    >({
+      query: (args) => ({
+        url: '/auth/register-employee',
+        method: 'POST',
+        body: args,
+        credentials: 'include',
+      }),
+      invalidatesTags: ['User'],
+    }),
+    getUserAppointments: builder.query<unknown, void>({
+      query: () => ({
+        url: '/appointment/user-appointments',
+        credentials: 'include',
+      }),
+      providesTags: ['Appointment'],
+    }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useLogoutMutation } =
-  authApiSlice;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useLogoutMutation,
+  useRegisterEmployeeMutation,
+  useGetUserAppointmentsQuery,
+} = authApiSlice;

@@ -11,4 +11,6 @@ export type AppointmentDto = {
   serviceId: number;
   appointmentDateTime?: Date;
   notes?: string;
+  isCompleted?: boolean;
+  isCancelled?: boolean;
 };

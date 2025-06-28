@@ -39,6 +39,33 @@ export const appointmentApiSlice = apiSlice.injectEndpoints({
       }),
       providesTags: (result, error, id) => [{ type: 'Appointment', id }],
     }),
+    updateAppointmentStatus: builder.mutation<
+      void,
+      {
+        id: number;
+        isCompleted?: boolean;
+        isCancelled?: boolean;
+      }
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/Appointment/${id}/status`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: ['Appointment'],
+    }),
+    getEmployeeAppointments: builder.query<AppointmentDto[], number>({
+      query: (employeeId) => `/Appointment/employee/${employeeId}`,
+      providesTags: ['Appointment'],
+    }),
+    getClientAppointments: builder.query<AppointmentDto[], number>({
+      query: (clientId) => `/Appointment/client/${clientId}`,
+      providesTags: ['Appointment'],
+    }),
+    getUserAppointments: builder.query<AppointmentDto[], void>({
+      query: () => '/Appointment/user-appointments',
+      providesTags: ['Appointment'],
+    }),
   }),
 });
 
@@ -46,4 +73,8 @@ export const {
   useAppointmentsQuery,
   useCreateAppointmentMutation,
   useGetAppointmentByIdQuery,
+  useUpdateAppointmentStatusMutation,
+  useGetEmployeeAppointmentsQuery,
+  useGetClientAppointmentsQuery,
+  useGetUserAppointmentsQuery,
 } = appointmentApiSlice;

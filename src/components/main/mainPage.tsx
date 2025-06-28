@@ -2,11 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Avatar, Typography, CircularProgress } from '@mui/material';
 import { useUserInfoQuery } from '../../api/userApiSlice';
+import { Roles } from '../../api/models/roles';
 import '../../App.css';
 import Man from '../../images/Man.jpg';
 
 export default function MainPage() {
-  // Получаем данные текущего пользователя из API
   const { data: currentUser, isLoading, isError } = useUserInfoQuery({});
 
   const typographySx = {
@@ -22,6 +22,7 @@ export default function MainPage() {
     color: '#000000',
     borderColor: '#000000',
     borderRadius: '18px',
+    margin: '0 10px 10px 0',
   };
 
   function stringToColor(string: string) {
@@ -81,11 +82,9 @@ export default function MainPage() {
           <Typography variant='h1' sx={typographySx} gutterBottom>
             WELCOME TO
           </Typography>
-
           <Typography variant='h1' sx={typographySx} gutterBottom>
             BARBERSHOP
           </Typography>
-
           <Typography variant='h1' sx={{ ...typographySx, p: 0 }} gutterBottom>
             ONLY FOR MEN
           </Typography>
@@ -104,8 +103,52 @@ export default function MainPage() {
                 variant='outlined'
                 sx={buttonSx}
               >
-                Выбрать услугу
+                Записи
               </Button>
+
+              {currentUser.role === Roles.User && (
+                <Button
+                  component={Link}
+                  to={'/my-appointments'}
+                  variant='outlined'
+                  sx={buttonSx}
+                >
+                  Мои записи
+                </Button>
+              )}
+
+              {currentUser.role === Roles.Employee && (
+                <Button
+                  component={Link}
+                  to={'/employee-dashboard'}
+                  variant='outlined'
+                  sx={buttonSx}
+                >
+                  Панель мастера
+                </Button>
+              )}
+
+              {currentUser.role === Roles.Admin && (
+                <>
+                  <Button
+                    component={Link}
+                    to={'/employee-dashboard'}
+                    variant='outlined'
+                    sx={buttonSx}
+                  >
+                    Панель мастера
+                  </Button>
+                  <Button
+                    component={Link}
+                    to={'/register-employee'}
+                    variant='outlined'
+                    sx={buttonSx}
+                  >
+                    Добавить мастера
+                  </Button>
+                </>
+              )}
+
               <Button
                 component={Link}
                 to={'/logout'}
@@ -114,10 +157,15 @@ export default function MainPage() {
               >
                 Выйти
               </Button>
+
               <Avatar
                 {...stringAvatar(currentUserName)}
                 src={currentUser.logoAttachmentUrl || undefined}
-                style={{ fontSize: '20px', padding: '5px' }}
+                style={{
+                  fontSize: '20px',
+                  padding: '5px',
+                  marginLeft: '10px',
+                }}
               />
             </>
           ) : (
